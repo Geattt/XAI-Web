@@ -1,1 +1,2 @@
 # XAI-Web
+Our project, “XAI-Based Ransomware Detection: A New Breakthrough in Machine Learning,” addresses these challenges by integrating machine learning with explainable AI (XAI). The system not only improves detection accuracy but also explains the specific behaviors and characteristics that classify a file as ransomware, making the process more transparent and trustworthy. This combination empowers users to better understand, respond to, and prevent ransomware threats.
