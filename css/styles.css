@@ -1,0 +1,345 @@
+/* Cyberpunk-inspired gradient background */
+body {
+  background: linear-gradient(125deg, #0F172A 0%, #1E293B 30%, #0F172A 70%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated grid background */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(0, 209, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 209, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -1;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
+/* Glass effect with futuristic border */
+.glass-card {
+  background: rgba(17, 25, 40, 0.75);
+  border: 1px solid rgba(0, 209, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.36),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow: 
+    0 12px 32px 0 rgba(0, 209, 255, 0.15),
+    inset 0 0 0 1px rgba(0, 209, 255, 0.3);
+}
+
+/* Light mode adjustments */
+body.light-mode {
+  background: linear-gradient(125deg, #b0c3ff 0%, #b0c3ff 30%, #b0c3ff 70%);
+}
+
+body.light-mode::before {
+  background-image: 
+    linear-gradient(rgba(126, 34, 206, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 34, 206, 0.05) 1px, transparent 1px);
+}
+
+body.light-mode .glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(126, 34, 206, 0.2);
+}
+
+body.light-mode .glass-card:hover {
+  box-shadow: 
+    0 12px 32px 0 rgba(126, 34, 206, 0.15),
+    inset 0 0 0 1px rgba(126, 34, 206, 0.3);
+}
+
+/* Spinner with futuristic style */
+.spinner {
+  border: 3px solid rgba(0, 209, 255, 0.1);
+  border-left-color: #00D1FF;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+  box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Toggle styles */
+.toggle-label {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 32px;
+  user-select: none;
+}
+
+.toggle-label input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 0; top: 0; bottom: 0; right: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.toggle-bg {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(125deg, #374151, #1F2937);
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  z-index: 1;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+}
+
+#toggleIcon {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(125deg, #00D1FF, #007BFF);
+  border-radius: 9999px;
+  box-shadow: 0 0 10px rgba(0, 209, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  user-select: none;
+  z-index: 2;
+}
+
+input:checked + .toggle-bg {
+  background: linear-gradient(125deg, #7E22CE, #581C87);
+}
+
+input:checked + .toggle-bg + #toggleIcon {
+  transform: translateX(28px);
+  background: linear-gradient(125deg, #FF0080, #7E22CE);
+  box-shadow: 0 0 12px rgba(255, 0, 128, 0.7);
+}
+
+/* Futuristic buttons */
+.cyber-button {
+  background: linear-gradient(125deg, rgba(0, 209, 255, 0.9), rgba(0, 123, 255, 0.9));
+  border: 1px solid rgba(0, 209, 255, 0.5);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(0, 209, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0)
+  );
+  transform: rotate(30deg);
+  transition: all 0.5s ease;
+}
+
+.cyber-button:hover {
+  box-shadow: 0 0 25px rgba(0, 209, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.cyber-button:hover::before {
+  transform: rotate(30deg) translate(10%, 10%);
+}
+
+.cyber-button:disabled {
+  background: linear-gradient(125deg, rgba(126, 34, 206, 0.4), rgba(126, 34, 206, 0.3));
+  box-shadow: 0 0 10px rgba(126, 34, 206, 0.2);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Navigation items */
+.nav-item {
+  position: relative;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  color: #5c7599;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(to bottom, #00D1FF, #007BFF);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-item:hover {
+  background: rgba(0, 209, 255, 0.1);
+}
+
+.nav-item:hover::before,
+.nav-item[aria-current="page"]::before {
+  opacity: 1;
+}
+
+.nav-item[aria-current="page"] {
+  background: rgba(0, 209, 255, 0.15);
+  color: #00D1FF;
+}
+
+/* File input styling */
+.file-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px dashed rgba(0, 209, 255, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.file-input:hover {
+  border-color: rgba(0, 209, 255, 0.6);
+  background: rgba(0, 209, 255, 0.05);
+}
+
+/* Chart container */
+.chart-container {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(0, 209, 255, 0.2);
+}
+
+/* Result display */
+.result-display {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 209, 255, 0.2);
+  font-family: 'JetBrains Mono', monospace;
+  padding: 1.5rem;
+  overflow-x: auto;
+  position: relative;
+}
+
+.result-display::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #00D1FF, transparent);
+}
+
+/* History list */
+.history-item {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.history-item:hover {
+  background: rgb(75, 88, 90);
+}
+
+/* Pulse animation for important elements */
+.pulse-element {
+  animation: pulse-slow 2s infinite;
+}
+
+/* Gradient text fix */
+.gradient-text {
+  background: linear-gradient(125deg, #00D1FF, #FF0080);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+/* Light mode gradient text */
+body.light-mode .gradient-text {
+  background: linear-gradient(125deg, #7E22CE, #FF0080);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Fallback for browsers that don't support background-clip */
+@supports not (-webkit-background-clip: text) {
+  .gradient-text {
+    color: #00D1FF;
+    background: none;
+  }
+  
+  body.light-mode .gradient-text {
+    color: #7E22CE;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 209, 255, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 209, 255, 0.5);
+}
+
+.shap-chart-container canvas {
+  width: 100% !important;
+  height: 300px !important;
+}

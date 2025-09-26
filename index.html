@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ransomware Analysis Pro Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="js/tailwind-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  
+  <!-- Enhanced styles for SHAP visualization -->
+  <style>
+    .shap-chart-container {
+      background: rgba(55, 65, 81, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .feature-explanation {
+      font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      background: rgba(31, 41, 55, 0.6);
+      border-left: 3px solid #6366f1;
+    }
+    
+    .risk-indicator {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .risk-indicator.low {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    
+    .risk-indicator.medium {
+      background: linear-gradient(135deg, rgba(251, 146, 60, 0.1), rgba(251, 146, 60, 0.05));
+      border: 1px solid rgba(251, 146, 60, 0.3);
+    }
+    
+    .threat-pulse {
+      animation: pulse-threat 2s infinite;
+    }
+    
+    @keyframes pulse-threat {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .feature-item {
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+    
+    .feature-item:hover {
+      background: rgba(55, 65, 81, 0.6);
+      border-left-color: #6366f1;
+    }
+    
+    .feature-risk {
+      border-left-color: #ef4444;
+    }
+    
+    .feature-safe {
+      border-left-color: #22c55e;
+    }
+    
+    .scrollable-content {
+      max-height: 400px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #4b5563 #1f2937;
+    }
+    
+    .scrollable-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .scrollable-content::-webkit-scrollbar-track {
+      background: #1f2937;
+      border-radius: 3px;
+    }
+    
+    .scrollable-content::-webkit-scrollbar-thumb {
+      background: #4b5563;
+      border-radius: 3px;
+    }
+    
+    .scrollable-content::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+  </style>
+</head>
+<body class="font-sans min-h-screen text-gray-100 flex dark-mode">
+
+  <!-- Sidebar Navigation -->
+  <aside class="flex flex-col w-72 p-6 space-y-8 glass-card m-4">
+    <div class="text-center">
+      <h1 class="text-3xl font-bold gradient-text select-none pb-2">RANSOMWARE PRO</h1>
+      <div class="h-1 w-24 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mt-2"></div>
+    </div>
+    
+    <nav class="flex flex-col space-y-2 text-gray-300 text-lg" role="navigation" aria-label="Main navigation">
+      <div class="nav-item flex items-center gap-3" id="nav-dashboard" aria-current="page">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item flex items-center gap-3" id="nav-result">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span>Result</span>
+      </div>
+      <div class="nav-item flex items-center gap-3" id="nav-history">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>History</span>
+      </div>
+    </nav>
+    
+    <div class="mt-auto pt-4 border-t border-gray-700">
+      <p class="text-sm text-gray-500 select-none text-center">&copy; 2025 RANSOMWARE PRO</p>
+      <div class="text-center mt-2">
+        <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-900 text-blue-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          AI Powered
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="flex flex-col flex-grow min-h-screen overflow-auto mr-4 my-4">
+    <!-- Header -->
+    <header class="flex items-center justify-between p-4 px-8 shadow-md sticky top-0 z-20 glass-card mb-6">
+      <h2 class="text-2xl font-semibold gradient-text select-none">
+        RANSOMWARE ANALYSIS DASHBOARD
+      </h2>
+      <div class="flex items-center gap-6">
+        <div class="hidden sm:flex items-center gap-2 text-sm text-gray-400">
+          <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <span>AI Ready</span>
+        </div>
+        <label for="darkModeToggle" class="toggle-label cursor-pointer select-none" aria-label="Toggle dark mode">
+          <input type="checkbox" id="darkModeToggle" class="sr-only" checked />
+          <div class="toggle-bg"></div>
+          <div id="toggleIcon">🌙</div>
+        </label>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4 max-w-7xl mx-auto space-y-8 flex-grow">
+
+      <!-- Dashboard Page -->
+      <section id="page-dashboard" class="glass-card p-8 max-w-xl mx-auto">
+        <h3 class="text-xl font-semibold mb-6 text-white select-none text-center" style="color: #5c7599;">UPLOAD & ANALYZE FILE</h3>
+        
+        <form id="uploadForm" class="space-y-6" aria-label="Ransomware analysis upload form">
+          <div class="file-input text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-primary mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <label for="fileInput" class="block mb-2 font-medium text-gray-300 select-none cursor-pointer" style="color: #5c7599;">
+              <span class="text-primary hover:underline" style="color: #5c7599;">Click to upload</span> or drag and drop
+            </label>
+            <input
+              type="file"
+              id="fileInput"
+              accept=".exe"
+              aria-describedby="fileHelp"
+              class="hidden"
+              required
+            />
+            <p id="fileHelp" class="text-sm text-gray-500 mt-2 select-none">Please upload .exe file type only</p>
+            <p id="fileName" class="text-sm text-primary mt-2 font-medium hidden"></p>
+          </div>
+          
+          <div class="flex flex-wrap gap-4 justify-center mt-6">
+            <button type="submit" id="analyzeBtn" class="cyber-button pulse-element">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              ANALYZE
+            </button>
+            <button type="button" id="exportPdfBtn" disabled class="cyber-button" aria-disabled="true">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              EXPORT PDF
+            </button>
+            <button type="button" id="exportCsvBtn" disabled class="cyber-button" aria-disabled="true">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              EXPORT CSV
+            </button>
+          </div>
+        </form>
+
+        <section id="errorMsg" class="hidden mt-6 bg-red-900 rounded-lg p-4 text-red-100 font-semibold select-none border border-red-700" role="alert" aria-live="assertive"></section>
+
+        <section id="loadingIndicator" class="hidden mt-6 flex flex-col items-center space-y-4" aria-live="polite" aria-busy="true" aria-label="Loading">
+          <div class="spinner" role="img" aria-label="Loading spinner"></div>
+          <p class="text-gray-400 text-sm animate-pulse">Analyzing with AI...</p>
+        </section>
+      </section>
+
+      <!-- Enhanced Result Page -->
+      <section id="page-result" class="hidden space-y-6">
+        <!-- Results will be populated by JavaScript -->
+        <div id="result"></div>
+        
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Confidence Chart -->
+          <div class="bg-gray-800 rounded-lg p-6">
+            <h4 class="text-lg font-semibold mb-4 text-white select-none text-center flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Prediction Confidence
+            </h4>
+            <div class="chart-container">
+              <canvas id="xaiChart" class="mx-auto" aria-label="Ransomware analysis confidence chart"></canvas>
+            </div>
+          </div>
+
+          <!-- SHAP Feature Importance Chart -->
+          <!-- <div class="glass-card p-6 shap-chart-container">
+            <h4 class="text-lg font-semibold mb-4 text-white select-none text-center flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              AI Feature Analysis
+            </h4>
+            <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+              <canvas id="shapChart" aria-label="SHAP feature importance chart"></canvas>
+            </div>
+            <p class="text-xs text-gray-400 mt-2 text-center">
+              Features that influenced the AI decision
+            </p>
+          </div>
+        </div> -->
+
+        <!-- Confidence vs Risk Scatter Plot -->
+        <div class="bg-gray-800 rounded-lg p-6">
+          <h4 class="text-lg font-semibold text-white mb-4 text-center">Confidence vs Risk</h4>
+          <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+            <canvas id="confidenceRiskChart" aria-label="Confidence vs Risk scatter chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Enhanced History Page -->
+      <section id="page-history" class="hidden glass-card p-6 sm:p-8 w-full max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-semibold text-white select-none flex items-center whitespace-nowrap" style="color: #5c7599;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            ANALYSIS HISTORY
+          </h3>
+          <div class="text-sm text-gray-400 ml-auto" style="margin-left: 35px;">
+            <span id="historyCount">0</span> analysis completed
+          </div>
+        </div>
+        
+        <div class="rounded-xl overflow-hidden">
+          <div class="scrollable-content">
+            <ul id="history" class="space-y-3" aria-live="polite"></ul>
+          </div>
+          <div id="noHistory" class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p class="text-gray-500 select-none text-lg font-medium">No analysis history yet</p>
+            <p class="text-gray-600 select-none text-sm mt-1">Upload and analyze your first file to get started</p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto p-4 text-center text-gray-500 text-sm border-t border-gray-800">
+      <div class="flex items-center justify-center space-x-4">
+        <span>&copy; 2025 Ransomware Pro</span>
+        <span>•</span>
+        <span class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          Secured with AI
+        </span>
+        <span>•</span>
+        <span class="text-blue-400">v2.0</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- External Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- Application Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
